@@ -22,7 +22,7 @@ mongoose.connect(DB_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-app.use('*', (req,res) => {
-  res.status(404).send({message: 'Страница не найдена'})
-})
-app.listen(PORT, () => { console.log('Слушаю порт 3000'); });
+app.use('*', (req, res) => {
+  res.status(404).send({ message: 'Страница не найдена' });
+});
+app.listen(PORT);
