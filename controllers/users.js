@@ -58,31 +58,26 @@ module.exports.editUserData = (req, res, next) => {
   if (req.user._id) {
     User.findByIdAndUpdate(req.user._id, { name, about }, { new: 'true', runValidators: true })
       .then((user) => res.send(user))
-      .catch((error) => {
-        if (error.name === 'ValidationError') {
-          next(new BadRequestError(error.message));
+      .catch((err) => {
+        if (err.name === 'ValidationError') {
+          next(new BadRequestError(err.message));
         } else {
-          next(error);
+          next(err);
         }
       });
-  } else {
-    next(error);
   }
 };
 
-module.exports.editUserAvatar = (req, res) => {
+module.exports.editUserAvatar = (req, res, next) => {
   if (req.user._id) {
     User.findByIdAndUpdate(req.user._id, { avatar: req.body.avatar }, { new: 'true', runValidators: true })
       .then((user) => res.send(user))
       .catch((error) => {
         if (error.name === 'ValidationError') {
           next(new BadRequestError(error.message));
-        } else {
-          next(error);
         }
+        next(error);
       });
-  } else {
-    next(error);
   }
 };
 
