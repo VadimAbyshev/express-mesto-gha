@@ -8,12 +8,14 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '64d8ea5762662845f54237df',
-  };
-  next();
-});
+
+
+// app.use((req, res, next) => {
+//   req.user = {
+//     _id: '64d8ea5762662845f54237df',
+//   };
+//   next();
+// });
 
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
@@ -22,7 +24,22 @@ mongoose.connect(DB_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
+
 app.use('*', (req, res) => {
   res.status(404).send({ message: 'Страница не найдена' });
 });
+
+app.use((error, req, res, next) => {
+  const { statusCode = 500, message } = error;
+  res
+    .status(statusCode)
+    .send({
+      
+      message: statusCode === 500
+        ? 'На сервере произошла ошибка'
+        : message,
+    });
+  next();
+});
+
 app.listen(PORT);

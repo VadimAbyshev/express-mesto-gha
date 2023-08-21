@@ -1,29 +1,30 @@
 const Card = require('../models/card');
-
+const NotFoundError = require('../errors/NotFoundError');
+const BadRequestError = require('../errors/BadRequestError');
 // Создание карточки
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(201).send({ data: card }))
 
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        res.status(400).send({ message: error.message });
+         next(new BadRequestError(error.message));
       } else {
-        res.status(500).send({ message: 'На сервере произошла ошибка' });
+        next(error)
       }
     });
 };
 
-module.exports.getCard = (req, res) => {
+module.exports.getCard = (req, res, next) => {
   Card.find({})
     .populate(['owner', 'likes'])
     .then((cards) => res.send(cards))
-    .catch(() => res.status(500).send({ message: 'На сервере произошла ошибка' }));
+    .catch(next);
 };
 
 // Удалить карточку
-module.exports.deleteCard = (req, res) => {
+module.exports.deleteCard = (req, res, next) => {
   Card.findByIdAndRemove(req.params.cardId)
     .orFail()
     .then((card) => {
@@ -31,17 +32,17 @@ module.exports.deleteCard = (req, res) => {
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        res.status(400).send({ message: 'Некорректный  _id' });
+        next(new BadRequestError('Некорректный  _id' ));
       } else if (error.name === 'DocumentNotFoundError') {
-        res.status(404).send({ message: 'Карточка с таким _id не существует' });
+        next(new NotFoundError('Карточка с таким _id не существует' ));
       } else {
-        res.status(500).send({ message: 'На сервере произошла ошибка' });
+       next(error)
       }
     });
 };
 
 // Установка лайка
-module.exports.setLike = (req, res) => {
+module.exports.setLike = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: 'true' })
     .orFail()
     .populate(['owner', 'likes'])
@@ -50,17 +51,17 @@ module.exports.setLike = (req, res) => {
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        res.status(400).send({ message: 'Некорректный  _id' });
+        next(new BadRequestError('Некорректный  _id' ));
       } else if (error.name === 'DocumentNotFoundError') {
-        res.status(404).send({ message: 'Карточка с таким _id не существует' });
+        next(new NotFoundError('Карточка с таким _id не существует' ));
       } else {
-        res.status(500).send({ message: 'На сервере произошла ошибка' });
+       next(error)
       }
     });
 };
 
 // Снятие лайка
-module.exports.removeLike = (req, res) => {
+module.exports.removeLike = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: 'true' })
     .orFail()
     .populate(['owner', 'likes'])
@@ -69,11 +70,11 @@ module.exports.removeLike = (req, res) => {
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        res.status(400).send({ message: 'Некорректный  _id' });
+        next(new BadRequestError('Некорректный  _id' ));
       } else if (error.name === 'DocumentNotFoundError') {
-        res.status(404).send({ message: 'Карточка с таким _id не существует' });
+        next(new NotFoundError('Карточка с таким _id не существует' ));
       } else {
-        res.status(500).send({ message: 'На сервере произошла ошибка' });
+        next(error)
       }
     });
 };
