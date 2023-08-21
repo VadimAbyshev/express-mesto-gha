@@ -96,7 +96,25 @@ module.exports.editUserAvatar = (req, res) => {
 };
 
 
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
 
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'sobaka', { expiresIn: '7d' });
+      res.send({ token });
+    })
+    .catch((err) => {
+        next(err);
+      }
+    );
+};
+
+module.exports.getMeUser = (req, res, next) => {
+  User.findById(req.user._id)
+    .then((user) => res.status(200).send(user))
+    .catch(next);
+};
 
 
 

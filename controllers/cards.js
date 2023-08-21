@@ -1,6 +1,8 @@
 const Card = require('../models/card');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
+const ForbiddenError = require('../errors/ForbiddenError');
+
 // Создание карточки
 module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
@@ -25,10 +27,14 @@ module.exports.getCard = (req, res, next) => {
 
 // Удалить карточку
 module.exports.deleteCard = (req, res, next) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
     .orFail()
     .then((card) => {
-      res.send(card);
+      if (!card.owner.equals(req.user._id)) {
+        throw new ForbiddenError('Нельзя удалить карточку чужого пользователя');
+      }
+      Card.deleteOne(card)
+        .then(() => res.send({ data: 'Карточка удалена' }));
     })
     .catch((error) => {
       if (error.name === 'CastError') {
@@ -40,6 +46,7 @@ module.exports.deleteCard = (req, res, next) => {
       }
     });
 };
+
 
 // Установка лайка
 module.exports.setLike = (req, res, next) => {
