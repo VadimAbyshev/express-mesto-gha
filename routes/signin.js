@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const {login} = require('../controllers/users')
 const { celebrate, Joi } = require('celebrate');
+const { login } = require('../controllers/users');
 
 router.post('/', celebrate({
   body: Joi.object().keys({

@@ -33,5 +33,4 @@ router.delete('/:cardId/likes', celebrate({
   }),
 }), removeLike);
 
-
 module.exports = router;

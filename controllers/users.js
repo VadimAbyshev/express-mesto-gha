@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
-const ConflictError = require('../errors/ConflictError')
+const ConflictError = require('../errors/ConflictError');
 
 module.exports.addUser = (req, res, next) => {
   const {
@@ -17,8 +17,8 @@ module.exports.addUser = (req, res, next) => {
     }))
 
     .then((user) => res.status(201).send({
-        name: user.name, about: user.about, avatar: user.avatar, email: user.email, _id: user._id, 
-      }))
+      name: user.name, about: user.about, avatar: user.avatar, email: user.email, _id: user._id,
+    }))
     .catch((err) => {
       if (err.code === 11000) {
         next(new ConflictError('Пользователь с таким email уже зарегестрирован'));
@@ -30,15 +30,11 @@ module.exports.addUser = (req, res, next) => {
     });
 };
 
-
-
-
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
     .catch(next);
 };
-
 
 module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
@@ -48,19 +44,14 @@ module.exports.getUserById = (req, res, next) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-
         next(new BadRequestError(`Некорректный _id: ${req.params.userId}`));
-        
       } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        next(new NotFoundError(`Пользователя не существует: ${req.params.userId}` ));
+        next(new NotFoundError(`Пользователя не существует: ${req.params.userId}`));
       } else {
-        next(err)
+        next(err);
       }
     });
 };
-
-
-
 
 module.exports.editUserData = (req, res, next) => {
   const { name, about } = req.body;
@@ -69,13 +60,13 @@ module.exports.editUserData = (req, res, next) => {
       .then((user) => res.send(user))
       .catch((error) => {
         if (error.name === 'ValidationError') {
-          next(new BadRequestError(error.message)); 
+          next(new BadRequestError(error.message));
         } else {
-          next(error)
+          next(error);
         }
       });
   } else {
-    next(error)
+    next(error);
   }
 };
 
@@ -85,16 +76,15 @@ module.exports.editUserAvatar = (req, res) => {
       .then((user) => res.send(user))
       .catch((error) => {
         if (error.name === 'ValidationError') {
-          next(new BadRequestError(error.message)); 
+          next(new BadRequestError(error.message));
         } else {
-          next(error)
+          next(error);
         }
       });
   } else {
-    next(error)
+    next(error);
   }
 };
-
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
@@ -105,9 +95,8 @@ module.exports.login = (req, res, next) => {
       res.send({ token });
     })
     .catch((err) => {
-        next(err);
-      }
-    );
+      next(err);
+    });
 };
 
 module.exports.getMeUser = (req, res, next) => {
@@ -115,6 +104,3 @@ module.exports.getMeUser = (req, res, next) => {
     .then((user) => res.status(200).send(user))
     .catch(next);
 };
-
-
-

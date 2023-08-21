@@ -11,9 +11,9 @@ module.exports.createCard = (req, res, next) => {
 
     .catch((error) => {
       if (error.name === 'ValidationError') {
-         next(new BadRequestError(error.message));
+        next(new BadRequestError(error.message));
       } else {
-        next(error)
+        next(error);
       }
     });
 };
@@ -38,15 +38,14 @@ module.exports.deleteCard = (req, res, next) => {
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        next(new BadRequestError('Некорректный  _id' ));
+        next(new BadRequestError('Некорректный  _id'));
       } else if (error.name === 'DocumentNotFoundError') {
-        next(new NotFoundError('Карточка с таким _id не существует' ));
+        next(new NotFoundError('Карточка с таким _id не существует'));
       } else {
-       next(error)
+        next(error);
       }
     });
 };
-
 
 // Установка лайка
 module.exports.setLike = (req, res, next) => {
@@ -58,11 +57,11 @@ module.exports.setLike = (req, res, next) => {
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        next(new BadRequestError('Некорректный  _id' ));
+        next(new BadRequestError('Некорректный  _id'));
       } else if (error.name === 'DocumentNotFoundError') {
-        next(new NotFoundError('Карточка с таким _id не существует' ));
+        next(new NotFoundError('Карточка с таким _id не существует'));
       } else {
-       next(error)
+        next(error);
       }
     });
 };
@@ -77,11 +76,11 @@ module.exports.removeLike = (req, res, next) => {
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        next(new BadRequestError('Некорректный  _id' ));
+        next(new BadRequestError('Некорректный  _id'));
       } else if (error.name === 'DocumentNotFoundError') {
-        next(new NotFoundError('Карточка с таким _id не существует' ));
+        next(new NotFoundError('Карточка с таким _id не существует'));
       } else {
-        next(error)
+        next(error);
       }
     });
 };
